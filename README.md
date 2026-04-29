@@ -1,23 +1,23 @@
-# 🤖 AI Anomaly Detection & Alert — AGV Industriali
-### Make + Google Sheets + OpenAI + Gmail
+# 🤖 AGV Anomaly Detection & Alert
+### Make · OpenAI GPT-4 · Google Sheets · Gmail
 
-Sistema di monitoraggio AI per AGV (Automated Guided Vehicles) che analizza automaticamente i dati operativi dei veicoli, rileva anomalie e situazioni critiche, e invia alert via email con report HTML professionale — progettato come demo per **E80 Group**.
-
----
-
-## 🚨 Il problema che risolve
-
-Gli AGV operano 24/7 nei plant industriali. Un guasto imprevisto può fermare l'intera linea produttiva. Monitorare manualmente decine di veicoli è impossibile. Questo sistema rileva automaticamente anomalie prima che diventino guasti critici.
+An AI-powered anomaly detection and alerting system for industrial AGV (Automated Guided Vehicles) fleets. The system automatically monitors operational data every hour, detects anomalies and critical situations, and delivers a professional HTML alert report via email — designed as a proof of concept for **E80 Group**, a world leader in intralogistics automation.
 
 ---
 
-## 🚀 Come funziona
+## 🏭 Industrial Context
 
-1. **Ogni ora** lo scenario si avvia automaticamente
-2. **Legge** i dati operativi di tutti gli AGV da Google Sheets
-3. **Aggrega** tutte le misurazioni in un testo strutturato
-4. **Analizza** con OpenAI GPT-4o rispetto alle soglie operative
-5. **Invia** un alert HTML professionale con dettaglio anomalie per ogni AGV
+E80 Group designs and installs AGV fleets, LGV systems and automated warehouses for clients such as Barilla, Nestlé and Coca-Cola. Their vehicles operate 24/7 — every unexpected breakdown can cost thousands of euros per minute. This system detects anomalies before they become critical failures, enabling proactive maintenance and reducing downtime.
+
+---
+
+## 🚀 How It Works
+
+1. **Every hour** the scenario triggers automatically via Make scheduler
+2. **Reads** operational data from all AGVs in Google Sheets
+3. **Aggregates** all measurements into a single structured text
+4. **Analyzes** the data with OpenAI GPT-4 against predefined thresholds
+5. **Delivers** a professional HTML alert email with per-AGV anomaly breakdown
 
 ---
 
@@ -26,9 +26,9 @@ Gli AGV operano 24/7 nei plant industriali. Un guasto imprevisto può fermare l'
 | Tool | Purpose |
 |------|---------|
 | [Make](https://make.com) | Workflow automation |
-| Google Sheets | Dati operativi AGV + soglie |
-| OpenAI API (GPT-4o) | Analisi anomalie AI |
-| Gmail | Alert email HTML |
+| Google Sheets | AGV operational data source |
+| OpenAI API (GPT-4o) | AI-powered anomaly analysis |
+| Gmail | HTML alert email delivery |
 
 ---
 
@@ -37,55 +37,79 @@ Gli AGV operano 24/7 nei plant industriali. Un guasto imprevisto può fermare l'
 ```
 Schedule (Every Hour)
         ↓
-Google Sheets — Search Rows (legge metriche AGV)
+Google Sheets — Search Rows
         ↓
-Tools — Text Aggregator (aggrega tutte le righe)
+Tools — Text Aggregator
         ↓
-OpenAI — Generate Completion (analizza anomalie)
+OpenAI — Generate Completion (GPT-4o)
         ↓
 Gmail — Send HTML Alert
 ```
 
 ---
 
-## 📊 Metriche Monitorate
+## 📊 Monitored Metrics & Thresholds
 
-| Metrica | Range Normale | Livello CRITICO |
-|---------|--------------|-----------------|
-| Velocità | 1.4 – 2.0 m/s | < 0.5 m/s |
-| Temperatura Batteria | 25 – 45°C | > 65°C |
-| Errori/ora | 0 – 1 | > 5 |
-| Cicli Completati | 10 – 20/ora | < 5 |
-| Carico | 500 – 1000 kg | > 1100 kg |
+| Metric | Normal Range | Critical Level |
+|--------|-------------|----------------|
+| Speed | 1.4 – 2.0 m/s | < 0.5 m/s |
+| Battery Temperature | 25 – 45°C | > 65°C |
+| Errors/hour | 0 – 1 | > 5 |
+| Completed Cycles | 10 – 20/hour | < 5 |
+| Load | 500 – 1000 kg | > 1100 kg |
 
 ---
 
 ## 📋 Google Sheets Structure
 
-### Tab: `Metriche` (dati operativi)
+### Tab: `Metriche` — Operational data
 
 | Timestamp | AGV_ID | Velocita | Temp_Batteria | Carico | Errori | Cicli | Stato |
 |-----------|--------|----------|---------------|--------|--------|-------|-------|
 | 2024-04-01 09:00 | AGV-02 | 0.4 | 58 | 920 | 3 | 8 | ANOMALIA |
 | 2024-04-01 10:00 | AGV-02 | 0.2 | 71 | 920 | 7 | 4 | CRITICO |
 
-### Tab: `Soglie` (valori di riferimento)
-
-| Metrica | Min | Max | Livello_Critico |
-|---------|-----|-----|-----------------|
-| Velocita | 1.4 | 2.0 | < 0.5 |
-| Temp_Batteria | 25 | 45 | > 65 |
+> ⚠️ Column names must be simple with no spaces, special characters or symbols. Make cannot correctly read columns named `Velocità (m/s)` — use `Velocita` instead.
 
 ---
 
-## 📧 Report Email
+## 📧 Alert Email Structure
 
-Il report HTML include:
-- **Header** rosso (CRITICO) / arancione (ANOMALIA) / verde (OK)
-- **KPI cards**: AGV monitorati, anomalie, critici
-- **Dettaglio per AGV**: problema, causa, azione immediata
-- **Box azioni**: 3 interventi prioritari
-- **Footer** automatico con timestamp
+The HTML alert email includes:
+
+- **Header** — Red (CRITICAL) / Orange (ANOMALY) / Green (OK)
+- **KPI Cards** — Total AGVs monitored, anomalies detected, critical count
+- **Per-AGV Detail** — Problem, probable cause, immediate action
+- **Priority Actions Box** — 3 prioritized interventions
+- **Automatic footer** with timestamp
+
+---
+
+## 🤖 OpenAI Prompt
+
+```
+Analyze this AGV monitoring data and write an analysis in Italian.
+
+NORMAL THRESHOLDS:
+- Speed: 1.4-2.0 m/s | CRITICAL if < 0.5
+- Battery temperature: 25-45°C | CRITICAL if > 65
+- Errors: 0-1 | CRITICAL if > 5
+- Cycles: 10-20/hour | CRITICAL if < 5
+
+DATA:
+{{text_aggregator}}
+
+For each AGV with anomalies write EXACTLY in this format:
+
+AGV-XX:
+• Problem: [brief description with exact values]
+• Cause: [probable cause]
+• Action: [immediate action required]
+
+If an AGV is normal write:
+AGV-XX:
+• Status: OK — all parameters within normal range
+```
 
 ---
 
@@ -93,53 +117,54 @@ Il report HTML include:
 
 ### Prerequisites
 - [Make account](https://make.com)
-- Google account con Google Sheets
+- Google account with Google Sheets
 - [OpenAI API key](https://platform.openai.com)
 - Gmail account
 
 ### Steps
 
-1. **Crea il Google Sheet** con la struttura sopra
-2. **Importa il blueprint** su Make (⋮ → Import Blueprint → `blueprint.json`)
-3. **Connetti gli account**: Google Sheets, OpenAI, Gmail
-4. **Aggiorna il modulo Google Sheets** con il tuo file
-5. **Run once** per testare → controlla la tua email
-6. **Attiva** il toggle per esecuzione automatica ogni ora
+1. **Create the Google Sheet** with the structure above — tab named `Metriche`
+2. **Import the blueprint** on Make: ⋮ → Import Blueprint → upload `blueprint.json`
+3. **Connect your accounts**: Google Sheets, OpenAI, Gmail
+4. **Update the Google Sheets module** with your file and sheet name
+5. **Run once** to test → check your inbox
+6. **Activate** the scenario toggle for automatic hourly execution
 
 ---
 
 ## 🔑 Key Design Decisions
 
-**Perché il template HTML è in Gmail e non in OpenAI?**
-OpenAI varia leggermente l'output HTML ad ogni chiamata anche con lo stesso prompt. Mettendo il template fisso in Gmail e usando OpenAI solo per il testo delle anomalie, la grafica è garantita sempre identica.
+**Why is the HTML template in Gmail and not in OpenAI?**
+OpenAI slightly varies HTML output on each call even with the same prompt. By putting the fixed template directly in Gmail and using OpenAI only for the anomaly analysis text, the report layout is guaranteed to be identical every time.
 
-**Perché colonne senza caratteri speciali?**
-Make non legge correttamente colonne con nomi come `Velocità (m/s)` o `Temperatura (°C)`. Usando nomi semplici come `Velocita` e `Temp_Batteria` si evitano errori di parsing.
+**Why simple column names without special characters?**
+Make cannot correctly read columns with names like `Velocità (m/s)` or `Temperatura (°C)`. Using simple names like `Velocita` and `Temp_Batteria` avoids parsing errors.
 
-**Perché Text Aggregator?**
-Search Rows restituisce un bundle per ogni riga (12 AGV = 12 bundle). Il Text Aggregator li collassa in un unico testo che OpenAI riceve in un singolo messaggio, evitando 12 email separate.
+**Why Text Aggregator?**
+Search Rows returns one bundle per row (12 AGVs = 12 bundles). The Text Aggregator collapses them into a single text that OpenAI receives in one message, preventing 12 separate emails.
 
 ---
 
 ## ⚠️ Common Issues
 
-| Problema | Causa | Soluzione |
-|----------|-------|-----------|
-| Valori vuoti nell'email | Variabili non collegate | Ritrascina variabili dal pannello nel Text Aggregator |
-| "Dati non disponibili" | `{{2.text}}` vuoto | Riseleziona variabile text dal pannello OpenAI |
-| Troppe email | Text Aggregator mal configurato | Verifica Source Module = Search Rows |
-| `Unable to parse range` | Nome foglio scritto a mano | Seleziona sempre dal dropdown |
+| Problem | Cause | Solution |
+|---------|-------|----------|
+| Empty values in email | Variables not linked after column rename | Re-drag variables from panel in Text Aggregator |
+| "Data not available" message | `{{2.text}}` is empty | Reselect text variable from OpenAI panel |
+| Multiple emails sent | Text Aggregator misconfigured | Verify Source Module = Search Rows |
+| `Unable to parse range` | Sheet name typed manually | Always select from dropdown |
+| Layout changes between runs | OpenAI generating HTML | HTML template must be in Gmail, not OpenAI |
 
 ---
 
-## 🏭 Adattamento per E80
+## 🔧 Adapting for Real Clients
 
-Per collegare il sistema ai dati reali degli AGV E80:
+To connect the system to real AGV data:
 
-1. Sostituire Google Sheets con il database operativo degli AGV (via API o export automatico)
-2. Aggiornare le soglie nel prompt OpenAI con i parametri reali di ogni modello AGV
-3. Aggiungere invio alert su Slack/Teams oltre che email
-4. Integrare con il sistema di ticketing manutenzione per apertura automatica ordini di intervento
+1. Replace Google Sheets with the actual AGV operational database (via API or automated export)
+2. Update thresholds in the OpenAI prompt with real parameters for each AGV model
+3. Add Slack/Teams alerts in addition to email
+4. Integrate with maintenance ticketing system for automatic work order creation
 
 ---
 
@@ -152,5 +177,6 @@ MIT — feel free to use, modify and share.
 ## 👤 Author
 
 **Matteo Daviddi**
-AI Automation Developer
-[LinkedIn](www.linkedin.com/in/matteodaviddi) · [GitHub](github.com/matteodaviddi)
+Data Analyst & Process Automation
+[LinkedIn](https://www.linkedin.com/in/matteodaviddi) · [GitHub](https://github.com/matteodaviddi)
+
