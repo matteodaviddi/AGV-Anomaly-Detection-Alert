@@ -5,12 +5,6 @@ Sistema di monitoraggio AI per AGV (Automated Guided Vehicles) che analizza auto
 
 ---
 
-## 🎬 Demo
-
-> 📹 [Watch the demo](#)
-
----
-
 ## 🚨 Il problema che risolve
 
 Gli AGV operano 24/7 nei plant industriali. Un guasto imprevisto può fermare l'intera linea produttiva. Monitorare manualmente decine di veicoli è impossibile. Questo sistema rileva automaticamente anomalie prima che diventino guasti critici.
